@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Register System</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial;
+}
+
+body{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#0f172a,#1e293b,#2563eb);
+}
+
+.container{
+    width:350px;
+    padding:30px;
+    border-radius:20px;
+    background:rgba(255,255,255,0.1);
+    backdrop-filter:blur(15px);
+    border:1px solid rgba(255,255,255,0.2);
+    box-shadow:0 0 25px rgba(0,0,0,0.3);
+}
+
+h2{
+    color:white;
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.inputBox{
+    margin-top:15px;
+}
+
+input{
+    width:100%;
+    padding:14px;
+    border:none;
+    outline:none;
+    border-radius:10px;
+    background:rgba(255,255,255,0.15);
+    color:white;
+    font-size:15px;
+}
+
+input::placeholder{
+    color:#ddd;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    margin-top:20px;
+    background:#3b82f6;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    background:#2563eb;
+}
+
+#msg{
+    margin-top:15px;
+    text-align:center;
+    color:white;
+}
+
+#userId{
+    margin-top:10px;
+    text-align:center;
+    color:#4ade80;
+    font-weight:bold;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Create Account</h2>
+
+<div class="inputBox">
+<input type="number" id="number" placeholder="Phone Number">
+</div>
+
+<div class="inputBox">
+<input type="password" id="password" placeholder="Password">
+</div>
+
+<div class="inputBox">
+<input type="password" id="confirmPassword" placeholder="Confirm Password">
+</div>
+
+<button onclick="registerUser()">Register</button>
+
+<div id="msg"></div>
+
+<div id="userId"></div>
+
+</div>
+
+<script>
+
+async function registerUser(){
+
+    let number = document.getElementById("number").value;
+    let password = document.getElementById("password").value;
+    let confirmPassword = document.getElementById("confirmPassword").value;
+
+    let msg = document.getElementById("msg");
+    let userIdBox = document.getElementById("userId");
+
+    msg.innerHTML = "";
+    userIdBox.innerHTML = "";
+
+    if(number == "" || password == "" || confirmPassword == ""){
+
+        msg.innerHTML = "Fill all fields";
+        return;
+
+    }
+
+    if(password !== confirmPassword){
+
+        msg.innerHTML = "Password not matched";
+        return;
+
+    }
+
+    let data = {
+        number:number,
+        password:password,
+        time:new Date().toLocaleString()
+    };
+
+    try{
+
+        let response = await fetch("https://script.google.com/macros/s/AKfycbxH5QOV2tI1NK8vRkh5I6dM3pgJsDBpccNYYKm6cI6dCIxQ0QaHWhXSYR1ouxQ8zgVAzw/exec",{
+
+            method:"POST",
+            body:JSON.stringify(data)
+
+        });
+
+        let text = await response.text();
+
+        let result = JSON.parse(text);
+
+        if(result.status == "exists"){
+
+            msg.innerHTML = "Number already registered";
+
+        }
+        else if(result.status == "success"){
+
+            msg.innerHTML = "Registration Successful";
+
+            userIdBox.innerHTML = "User ID : " + result.userId;
+
+            document.getElementById("number").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("confirmPassword").value = "";
+
+        }
+        else{
+
+            msg.innerHTML = result.message;
+
+        }
+
+    }catch(error){
+
+        console.log(error);
+
+        msg.innerHTML = "Server Error";
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
