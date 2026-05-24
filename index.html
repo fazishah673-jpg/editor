@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Modern Register</title>
+<title>Register Page</title>
 
 <style>
 
@@ -26,15 +27,213 @@ body{
 
 .container{
     width:100%;
-    max-width:380px;
+    max-width:360px;
+    background:rgba(255,255,255,0.1);
+    backdrop-filter:blur(15px);
+    border:1px solid rgba(255,255,255,0.2);
+    border-radius:20px;
     padding:30px;
-    border-radius:22px;
-    background:rgba(255,255,255,0.12);
-    backdrop-filter:blur(18px);
-    border:1px solid rgba(255,255,255,0.15);
-    box-shadow:0 10px 40px rgba(0,0,0,0.35);
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
+h2{
+    color:white;
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.inputBox{
+    margin-bottom:18px;
+}
+
+input{
+    width:100%;
+    height:50px;
+    border:none;
+    outline:none;
+    border-radius:12px;
+    padding:0 15px;
+    background:rgba(255,255,255,0.15);
+    color:white;
+    font-size:15px;
+}
+
+input::placeholder{
+    color:#ddd;
+}
+
+button{
+    width:100%;
+    height:50px;
+    border:none;
+    border-radius:12px;
+    background:#3b82f6;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    background:#2563eb;
+}
+
+button:disabled{
+    opacity:0.7;
+}
+
+#msg{
+    margin-top:15px;
+    text-align:center;
+    color:white;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Create Account</h2>
+
+<div class="inputBox">
+<input
+type="tel"
+id="number"
+placeholder="Phone Number"
+maxlength="11"
+>
+</div>
+
+<div class="inputBox">
+<input
+type="password"
+id="password"
+placeholder="Password"
+>
+</div>
+
+<div class="inputBox">
+<input
+type="password"
+id="confirmPassword"
+placeholder="Confirm Password"
+>
+</div>
+
+<button id="registerBtn" onclick="registerUser()">
+Register
+</button>
+
+<div id="msg"></div>
+
+</div>
+
+<script>
+
+let isSubmitting = false;
+
+async function registerUser(){
+
+    if(isSubmitting) return;
+
+    let number = document.getElementById("number").value.trim();
+    let password = document.getElementById("password").value;
+    let confirmPassword = document.getElementById("confirmPassword").value;
+
+    let msg = document.getElementById("msg");
+    let btn = document.getElementById("registerBtn");
+
+    msg.innerHTML = "";
+
+    if(number == "" || password == "" || confirmPassword == ""){
+
+        msg.innerHTML = "Fill all fields";
+        return;
+
+    }
+
+    if(number.length != 11){
+
+        msg.innerHTML = "Enter valid number";
+        return;
+
+    }
+
+    if(password !== confirmPassword){
+
+        msg.innerHTML = "Password not matched";
+        return;
+
+    }
+
+    isSubmitting = true;
+
+    btn.disabled = true;
+    btn.innerHTML = "Please Wait...";
+
+    let data = {
+
+        number:number,
+        password:password,
+        time:new Date().toLocaleString()
+
+    };
+
+    try{
+
+        let response = await fetch("https://script.google.com/macros/s/AKfycbxH5QOV2tI1NK8vRkh5I6dM3pgJsDBpccNYYKm6cI6dCIxQ0QaHWhXSYR1ouxQ8zgVAzw/exec",{
+
+            method:"POST",
+            body:JSON.stringify(data)
+
+        });
+
+        let text = await response.text();
+
+        let result = JSON.parse(text);
+
+        if(result.status == "exists"){
+
+            msg.innerHTML = "Number already registered";
+
+        }
+        else if(result.status == "success"){
+
+            msg.innerHTML = "Registration Successful";
+
+            document.getElementById("number").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("confirmPassword").value = "";
+
+        }
+        else{
+
+            msg.innerHTML = "Error";
+
+        }
+
+    }catch(error){
+
+        console.log(error);
+
+        msg.innerHTML = "Server Error";
+
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = "Register";
+
+    isSubmitting = false;
+
+}
+
+</script>
+
+</body>
+</html>
 .logo{
     width:75px;
     height:75px;
