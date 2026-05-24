@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Register System</title>
+<title>Modern Register</title>
 
 <style>
 
@@ -12,29 +12,280 @@
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial;
+    font-family:Arial,sans-serif;
 }
 
 body{
-    height:100vh;
+    min-height:100vh;
     display:flex;
     justify-content:center;
     align-items:center;
     background:linear-gradient(135deg,#0f172a,#1e293b,#2563eb);
+    padding:20px;
 }
 
 .container{
-    width:350px;
+    width:100%;
+    max-width:380px;
     padding:30px;
-    border-radius:20px;
-    background:rgba(255,255,255,0.1);
-    backdrop-filter:blur(15px);
-    border:1px solid rgba(255,255,255,0.2);
-    box-shadow:0 0 25px rgba(0,0,0,0.3);
+    border-radius:22px;
+    background:rgba(255,255,255,0.12);
+    backdrop-filter:blur(18px);
+    border:1px solid rgba(255,255,255,0.15);
+    box-shadow:0 10px 40px rgba(0,0,0,0.35);
+}
+
+.logo{
+    width:75px;
+    height:75px;
+    margin:auto;
+    margin-bottom:18px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#3b82f6,#60a5fa);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:30px;
+    color:white;
+    font-weight:bold;
 }
 
 h2{
+    text-align:center;
     color:white;
+    margin-bottom:25px;
+    font-size:28px;
+}
+
+.inputBox{
+    margin-bottom:18px;
+}
+
+.inputBox input{
+    width:100%;
+    height:52px;
+    padding:0 16px;
+    border:none;
+    outline:none;
+    border-radius:14px;
+    background:rgba(255,255,255,0.15);
+    color:white;
+    font-size:15px;
+    transition:0.3s;
+}
+
+.inputBox input:focus{
+    background:rgba(255,255,255,0.22);
+    border:1px solid rgba(255,255,255,0.3);
+}
+
+.inputBox input::placeholder{
+    color:#d1d5db;
+}
+
+button{
+    width:100%;
+    height:52px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(135deg,#2563eb,#3b82f6);
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 20px rgba(37,99,235,0.4);
+}
+
+button:disabled{
+    opacity:0.7;
+    cursor:not-allowed;
+}
+
+#msg{
+    margin-top:18px;
+    text-align:center;
+    color:white;
+    font-size:15px;
+    min-height:20px;
+}
+
+.footer{
+    text-align:center;
+    color:#d1d5db;
+    margin-top:20px;
+    font-size:13px;
+}
+
+@media(max-width:480px){
+
+    .container{
+        padding:25px;
+    }
+
+    h2{
+        font-size:24px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="logo">
+R
+</div>
+
+<h2>Create Account</h2>
+
+<div class="inputBox">
+<input 
+type="tel"
+id="number"
+placeholder="Enter Phone Number"
+maxlength="11"
+>
+</div>
+
+<div class="inputBox">
+<input 
+type="password"
+id="password"
+placeholder="Enter Password"
+>
+</div>
+
+<div class="inputBox">
+<input 
+type="password"
+id="confirmPassword"
+placeholder="Confirm Password"
+>
+</div>
+
+<button id="registerBtn" onclick="registerUser()">
+Register Now
+</button>
+
+<div id="msg"></div>
+
+<div class="footer">
+Secure Registration System
+</div>
+
+</div>
+
+<script>
+
+let isSubmitting = false;
+
+async function registerUser(){
+
+    if(isSubmitting) return;
+
+    let number = document.getElementById("number").value.trim();
+    let password = document.getElementById("password").value;
+    let confirmPassword = document.getElementById("confirmPassword").value;
+
+    let msg = document.getElementById("msg");
+    let btn = document.getElementById("registerBtn");
+
+    msg.innerHTML = "";
+
+    if(number == "" || password == "" || confirmPassword == ""){
+
+        msg.innerHTML = "Please fill all fields";
+        return;
+
+    }
+
+    if(number.length !== 11){
+
+        msg.innerHTML = "Enter valid 11 digit number";
+        return;
+
+    }
+
+    if(password !== confirmPassword){
+
+        msg.innerHTML = "Passwords do not match";
+        return;
+
+    }
+
+    isSubmitting = true;
+
+    btn.disabled = true;
+    btn.innerHTML = "Please Wait...";
+
+    let data = {
+
+        number:number,
+        password:password,
+        time:new Date().toLocaleString()
+
+    };
+
+    try{
+
+        let response = await fetch("https://script.google.com/macros/s/AKfycbxH5QOV2tI1NK8vRkh5I6dM3pgJsDBpccNYYKm6cI6dCIxQ0QaHWhXSYR1ouxQ8zgVAzw/exec",{
+
+            method:"POST",
+            body:JSON.stringify(data)
+
+        });
+
+        let text = await response.text();
+
+        let result = JSON.parse(text);
+
+        if(result.status == "exists"){
+
+            msg.innerHTML = "Number already registered";
+
+        }
+        else if(result.status == "success"){
+
+            msg.innerHTML = "Registration Successful";
+
+            document.getElementById("number").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("confirmPassword").value = "";
+
+        }
+        else{
+
+            msg.innerHTML = "Something went wrong";
+
+        }
+
+    }catch(error){
+
+        console.log(error);
+
+        msg.innerHTML = "Server Error";
+
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = "Register Now";
+
+    isSubmitting = false;
+
+}
+
+</script>
+
+</body>
+</html>    color:white;
     text-align:center;
     margin-bottom:25px;
 }
